@@ -75,6 +75,10 @@
     // Do any additional setup after loading the view.
     self.activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.activityIndicator];
+   
+
+    
+    self.awesomeToolbar.frame = CGRectMake(20, 200, 280, 50);
     
 }
 
@@ -85,14 +89,13 @@
     static const CGFloat itemHeight = 50;
     CGFloat width = CGRectGetWidth(self.view.bounds);
     CGFloat height = CGRectGetHeight(self.view.bounds);
-    CGFloat paddingX = CGRectGetWidth(self.view.bounds) / 6;
     CGFloat browserHeight = height - itemHeight;
     
     //assign the frames
     self.textField.frame = CGRectMake(0, 0, width, itemHeight);
     self.webView.frame = CGRectMake(0, CGRectGetMaxY(self.textField.frame), width, browserHeight);
     
-    self.awesomeToolbar.frame = CGRectMake(paddingX, height - itemHeight - itemHeight, width - paddingX - paddingX, itemHeight);
+
     
 }
 
@@ -179,6 +182,31 @@
     }
 }
 
+- (void) floatingToolbar:(BLCAwesomeFloatingToolbar *)toolbar didTryToPanWithOffset:(CGPoint)offset {
+    CGPoint startingPoint = toolbar.frame.origin;
+    CGPoint newPoint = CGPointMake(startingPoint.x + offset.x, startingPoint.y + offset.y);
+    
+    CGRect potentialNewFrame = CGRectMake(newPoint.x, newPoint.y, CGRectGetWidth(toolbar.frame), CGRectGetHeight(toolbar.frame));
+    
+    if (CGRectContainsRect(self.view.bounds, potentialNewFrame)) {
+        toolbar.frame = potentialNewFrame;
+    }
+}
 
+- (void) floatingToolbar:(BLCAwesomeFloatingToolbar *)toolbar didTryToPinchWithScaler:(CGFloat)scaler {
+    CGPoint startingPoint = toolbar.frame.origin;
+    CGFloat newWidth = CGRectGetWidth(toolbar.frame) * scaler;
+    CGFloat newHeight = CGRectGetHeight(toolbar.frame) * scaler;
 
+    CGRect potentialScaledFrame = CGRectMake(startingPoint.x, startingPoint.y, newWidth, newHeight);
+    if (CGRectContainsRect(self.view.bounds, potentialScaledFrame)) {
+        NSLog(@"Scaled frame size is X:%f Y:%f", potentialScaledFrame.size.width, potentialScaledFrame.size.height);
+        toolbar.frame = potentialScaledFrame;
+    }
+}
+
+- (void) floatingToolbarDidLongTapButton:(BLCAwesomeFloatingToolbar *)toolbar {
+    [toolbar colorChooser];
+    
+}
 @end
